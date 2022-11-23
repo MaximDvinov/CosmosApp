@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CosmosApp</string>
+    <string name="get_a_random">Get a random</string>
 </resources>

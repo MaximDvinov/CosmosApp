@@ -5,9 +5,9 @@ import com.cosmos.app.screen.random.model.ApodModel
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface RandomApi {
+interface ApodApi {
     @GET("/planetary/apod?")
-    suspend fun getRandomImage(
+    suspend fun getApodDataRandom(
         @Query("api_key") apiKey: String = NASA_KEY,
         @Query("count") count: Int = 1
     ): List<ApodModel>

@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.cosmos.app'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.cosmos.app"
         minSdk 23
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -59,8 +59,15 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: retrofit_version
 
+    implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
+
     // image
-    implementation 'io.coil-kt:coil-compose:2.2.2'
+//    implementation 'io.coil-kt:coil-compose:2.2.2'
+    implementation "com.github.skydoves:landscapist-glide:2.1.0"
 
     // animation (lottie)
     implementation "com.airbnb.android:lottie-compose:5.2.0"
