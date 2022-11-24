@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.cosmos.app.ApiError
 import com.cosmos.app.ApiException
 import com.cosmos.app.ApiSuccess
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class RandomViewModel(private val repository: RandomRepository) : ViewModel() {
+@HiltViewModel
+class RandomViewModel @Inject constructor(private val repository: RandomRepository) : ViewModel() {
     var uiState by mutableStateOf(RandomUiState())
         private set
 

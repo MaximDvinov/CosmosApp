@@ -2,6 +2,7 @@ package com.cosmos.app.screen.random
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,29 +19,33 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.cosmos.app.screen.random.model.ApodModel
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
-import org.koin.androidx.compose.koinViewModel
 import com.cosmos.app.R
 import com.cosmos.app.ui.theme.*
 
 @Composable
-fun RandomScreen(viewModel: RandomViewModel = koinViewModel()) {
+fun RandomScreen(
+    viewModel: RandomViewModel = hiltViewModel(),
+    onClickImage: (url: String) -> Unit
+) {
     val uiState = viewModel.uiState
 
-    LaunchedEffect(false) {
-        viewModel.getApodDataRandom()
+    LaunchedEffect(Unit) {
+        if (uiState.apodData == null)
+            viewModel.getApodDataRandom()
     }
 
     Crossfade(targetState = uiState.isLoading) { isLoading ->
         if (isLoading) {
             ProgressIndicator()
         } else {
-            ApodContent(uiState) { viewModel.getApodDataRandom() }
+            ApodContent(uiState, onClickImage) { viewModel.getApodDataRandom() }
         }
     }
 
@@ -49,6 +54,7 @@ fun RandomScreen(viewModel: RandomViewModel = koinViewModel()) {
 @Composable
 private fun ApodContent(
     uiState: RandomUiState,
+    onClickImage: (url: String) -> Unit,
     onClick: () -> Unit
 ) {
     Column(
@@ -58,7 +64,7 @@ private fun ApodContent(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(Modifier.padding(horizontal = 16.dp)) {
-            MediaContentContainer(apodData = uiState.apodData)
+            MediaContentContainer(apodData = uiState.apodData, onClickImage = onClickImage)
             DescriptionAndCopyright(apodData = uiState.apodData)
         }
         GetARandomBtn { onClick() }
@@ -129,10 +135,14 @@ fun ProgressIndicator() {
 }
 
 @Composable
-fun MediaContentContainer(modifier: Modifier = Modifier, apodData: ApodModel?) {
+fun MediaContentContainer(
+    modifier: Modifier = Modifier,
+    apodData: ApodModel?,
+    onClickImage: (url: String) -> Unit
+) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (!apodData?.hdurl.isNullOrBlank() || !apodData?.url.isNullOrBlank())
-            ImageView(apodData?.hdurl ?: apodData?.url!!, apodData?.title)
+            ImageView(apodData?.hdurl ?: apodData?.url!!, apodData?.title, onClickImage)
 
         if (!apodData?.title.isNullOrBlank())
             Title(modifier = Modifier, text = apodData?.title!!)
@@ -140,7 +150,11 @@ fun MediaContentContainer(modifier: Modifier = Modifier, apodData: ApodModel?) {
 }
 
 @Composable
-private fun ImageView(url: String, contentDescription: String?) {
+private fun ImageView(
+    url: String,
+    contentDescription: String?,
+    onClickImage: (url: String) -> Unit
+) {
     GlideImage(
         imageModel = { url },
         imageOptions = ImageOptions(
@@ -150,7 +164,10 @@ private fun ImageView(url: String, contentDescription: String?) {
         modifier = Modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 100.dp)
-            .clip(RoundedCornerShape(16.dp)),
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                onClickImage(url)
+            },
         loading = {
             ImageLoading()
         },

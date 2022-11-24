@@ -3,12 +3,17 @@ package com.cosmos.app.di
 import com.cosmos.app.screen.random.RandomRepository
 import com.cosmos.app.screen.random.RandomRepositoryImpl
 import com.cosmos.app.screen.random.RandomViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 
-val appModule = module {
-
-    single<RandomRepository> { RandomRepositoryImpl() }
-    viewModel { RandomViewModel(get()) }
-
+@Module
+@InstallIn(ViewModelComponent::class)
+interface AppModule {
+    @Binds
+    fun bindsRandomScreenRepository(
+        randomRepository: RandomRepositoryImpl
+    ): RandomRepository
 }

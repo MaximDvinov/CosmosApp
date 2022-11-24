@@ -7,12 +7,13 @@ import com.cosmos.app.ApiSuccess
 import com.cosmos.app.network.NetworkManager
 import com.cosmos.app.screen.random.model.ApodModel
 import retrofit2.HttpException
+import javax.inject.Inject
 
 interface RandomRepository {
     suspend fun getApodDataRandom(): ApiResult<ApodModel>
 }
 
-class RandomRepositoryImpl : RandomRepository {
+class RandomRepositoryImpl @Inject constructor() : RandomRepository {
     override suspend fun getApodDataRandom(): ApiResult<ApodModel> {
         return try {
             val response = NetworkManager.getApodApi().getApodDataRandom()
