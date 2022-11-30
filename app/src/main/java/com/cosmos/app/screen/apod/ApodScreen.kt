@@ -1,12 +1,9 @@
-package com.cosmos.app.screen.random
+package com.cosmos.app.screen.apod
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,33 +16,37 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.cosmos.app.screen.random.model.ApodModel
+import com.cosmos.app.screen.apod.model.ApodModel
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import com.cosmos.app.R
+import com.cosmos.app.getYoutubeId
 import com.cosmos.app.ui.theme.*
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
-fun RandomScreen(
-    viewModel: RandomViewModel = hiltViewModel(),
-    onClickImage: (url: String) -> Unit
+fun ApodScreen(
+    scrollState: ScrollState,
+    viewModel: ApodViewModel = hiltViewModel(), onClickImage: (url: String) -> Unit
 ) {
     val uiState = viewModel.uiState
 
     LaunchedEffect(Unit) {
-        if (uiState.apodData == null)
-            viewModel.getApodDataRandom()
+        if (uiState.apodData == null) viewModel.getApodDataRandom()
     }
 
     Crossfade(targetState = uiState.isLoading) { isLoading ->
         if (isLoading) {
             ProgressIndicator()
         } else {
-            ApodContent(uiState, onClickImage) { viewModel.getApodDataRandom() }
+            ApodContent(scrollState = scrollState, uiState, onClickImage) { viewModel.getApodDataRandom() }
         }
     }
 
@@ -53,26 +54,25 @@ fun RandomScreen(
 
 @Composable
 private fun ApodContent(
-    uiState: RandomUiState,
-    onClickImage: (url: String) -> Unit,
-    onClick: () -> Unit
+    scrollState: ScrollState,
+    uiState: ApodUiState, onClickImage: (url: String) -> Unit, onClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(scrollState),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(Modifier.padding(horizontal = 16.dp)) {
             MediaContentContainer(apodData = uiState.apodData, onClickImage = onClickImage)
             DescriptionAndCopyright(apodData = uiState.apodData)
         }
-        GetARandomBtn { onClick() }
+        GetARandomApodBtn { onClick() }
     }
 }
 
 @Composable
-private fun GetARandomBtn(onClick: () -> Unit) {
+private fun GetARandomApodBtn(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
@@ -106,12 +106,11 @@ private fun DescriptionAndCopyright(apodData: ApodModel?) {
             modifier = Modifier.padding(vertical = 4.dp)
         )
 
-        if (!apodData?.copyright.isNullOrBlank())
-            Text(
-                text = apodData?.copyright!!,
-                style = subTitle,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
+        if (!apodData?.copyright.isNullOrBlank()) Text(
+            text = apodData?.copyright!!,
+            style = subTitle,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
     }
 
 }
@@ -136,30 +135,50 @@ fun ProgressIndicator() {
 
 @Composable
 fun MediaContentContainer(
-    modifier: Modifier = Modifier,
-    apodData: ApodModel?,
-    onClickImage: (url: String) -> Unit
+    modifier: Modifier = Modifier, apodData: ApodModel?, onClickImage: (url: String) -> Unit
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        if (!apodData?.hdurl.isNullOrBlank() || !apodData?.url.isNullOrBlank())
-            ImageView(apodData?.hdurl ?: apodData?.url!!, apodData?.title, onClickImage)
+        if (!apodData?.hdurl.isNullOrBlank() || !apodData?.url.isNullOrBlank()) {
+            if (apodData?.media_type == "image")
+                ImageView(
+                    apodData.hdurl ?: apodData.url!!,
+                    apodData.title,
+                    onClickImage
+                )
+            else
+                YouTubeView(apodData?.url)
+        }
 
-        if (!apodData?.title.isNullOrBlank())
-            Title(modifier = Modifier, text = apodData?.title!!)
+        if (!apodData?.title.isNullOrBlank()) Title(modifier = Modifier, text = apodData?.title!!)
     }
 }
 
 @Composable
+fun YouTubeView(url: String?) {
+    AndroidView(modifier = Modifier
+        .fillMaxWidth()
+        .defaultMinSize(minHeight = 100.dp)
+        .clip(RoundedCornerShape(16.dp)), factory = { context ->
+        val youTubePlayerView = YouTubePlayerView(context)
+
+        youTubePlayerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
+            override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
+                getYoutubeId(url)?.let { youTubePlayer.loadVideo(it, 0f) }
+            }
+
+        })
+
+        return@AndroidView youTubePlayerView
+    }, update = { })
+}
+
+@Composable
 private fun ImageView(
-    url: String,
-    contentDescription: String?,
-    onClickImage: (url: String) -> Unit
+    url: String, contentDescription: String?, onClickImage: (url: String) -> Unit
 ) {
-    GlideImage(
-        imageModel = { url },
+    GlideImage(imageModel = { url },
         imageOptions = ImageOptions(
-            contentDescription = contentDescription,
-            contentScale = ContentScale.FillWidth
+            contentDescription = contentDescription, contentScale = ContentScale.FillWidth
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -173,8 +192,7 @@ private fun ImageView(
         },
         failure = {
             ImageError(text = "error loading the image")
-        }
-    )
+        })
 }
 
 @Composable
@@ -184,15 +202,13 @@ fun ImageError(text: String) {
             .fillMaxWidth()
             .height(200.dp)
             .background(card_bg)
-            .clip(RoundedCornerShape(16.dp)),
-        contentAlignment = Alignment.Center
+            .clip(RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             style = title,
             maxLines = 2,
-            modifier = Modifier
-                .padding(top = 12.dp, start = 15.dp, end = 15.dp, bottom = 12.dp)
+            modifier = Modifier.padding(top = 12.dp, start = 15.dp, end = 15.dp, bottom = 12.dp)
         )
     }
 }
@@ -204,8 +220,7 @@ private fun ImageLoading() {
             .fillMaxWidth()
             .height(200.dp)
             .background(card_bg)
-            .clip(RoundedCornerShape(16.dp)),
-        contentAlignment = Alignment.Center
+            .clip(RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center
     ) {
         ProgressIndicator()
     }

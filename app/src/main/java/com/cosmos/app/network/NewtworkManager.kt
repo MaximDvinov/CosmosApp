@@ -1,7 +1,7 @@
 package com.cosmos.app.network
 
 import com.cosmos.app.Constant.NASA_URL
-import com.cosmos.app.screen.random.ApodApi
+import com.cosmos.app.screen.apod.ApodApi
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature

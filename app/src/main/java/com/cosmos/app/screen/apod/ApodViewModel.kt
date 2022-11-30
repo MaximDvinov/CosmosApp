@@ -1,4 +1,4 @@
-package com.cosmos.app.screen.random
+package com.cosmos.app.screen.apod
 
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RandomViewModel @Inject constructor(private val repository: RandomRepository) : ViewModel() {
-    var uiState by mutableStateOf(RandomUiState())
+class ApodViewModel @Inject constructor(private val repository: ApodRepository) : ViewModel() {
+    var uiState by mutableStateOf(ApodUiState())
         private set
 
     fun getApodDataRandom() {

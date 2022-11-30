@@ -72,6 +72,9 @@ dependencies {
     // image
     implementation "com.github.skydoves:landscapist-glide:2.1.0"
 
+    // youtube
+    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1'
+
     // accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.1"
 

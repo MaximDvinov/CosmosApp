@@ -1,4 +1,4 @@
-package com.cosmos.app.screen.random.model
+package com.cosmos.app.screen.apod.model
 
 import java.time.LocalDate
 

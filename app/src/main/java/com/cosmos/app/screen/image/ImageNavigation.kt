@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.cosmos.app.screen.random.RandomScreen
 
 const val imageScreenRoute = "image_screen"
 const val imageUrlArg = "url"
