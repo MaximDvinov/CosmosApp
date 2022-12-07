@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.cosmos.app.screen.image.imageScreen
-import com.cosmos.app.screen.image.navigateToImageScreen
 import com.cosmos.app.screen.apod.apodScreen
 import com.cosmos.app.screen.apod.randomScreenRoute
 
@@ -21,9 +20,7 @@ fun NavigationGraph(
         startDestination = randomScreenRoute,
         modifier = modifier,
     ) {
-        apodScreen(scrollState) { url ->
-            navController.navigateToImageScreen(url)
-        }
+        apodScreen(scrollState, navController)
 
         imageScreen() {
             navController.popBackStack()

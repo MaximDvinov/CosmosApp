@@ -39,4 +39,26 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
             }
         }
     }
+
+    fun getApodToday() {
+        uiState = uiState.copy(isLoading = true)
+
+        viewModelScope.launch {
+            uiState = when (val result = repository.getApodToday()) {
+                is ApiError -> {
+                    Log.e("getApodToday", result.message.toString())
+                    uiState.copy(isLoading = false, errorMessage = result.message)
+
+                }
+                is ApiException -> {
+                    Log.e("getApodToday", result.e.message.toString())
+                    uiState.copy(isLoading = false, errorMessage = "Неизвестная ошибка")
+                }
+                is ApiSuccess -> {
+                    Log.e("getApodToday", "Success")
+                    uiState.copy(isLoading = false, apodData = result.data)
+                }
+            }
+        }
+    }
 }

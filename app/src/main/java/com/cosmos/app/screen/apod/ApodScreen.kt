@@ -9,15 +9,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
@@ -26,27 +30,35 @@ import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import com.cosmos.app.R
 import com.cosmos.app.getYoutubeId
+import com.cosmos.app.screen.image.navigateToImageScreen
 import com.cosmos.app.ui.theme.*
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ApodScreen(
     scrollState: ScrollState,
-    viewModel: ApodViewModel = hiltViewModel(), onClickImage: (url: String) -> Unit
+    viewModel: ApodViewModel = hiltViewModel(),
+    navController: NavHostController
 ) {
     val uiState = viewModel.uiState
 
     LaunchedEffect(Unit) {
-        if (uiState.apodData == null) viewModel.getApodDataRandom()
+        if (uiState.apodData == null) viewModel.getApodToday()
     }
 
     Crossfade(targetState = uiState.isLoading) { isLoading ->
         if (isLoading) {
             ProgressIndicator()
         } else {
-            ApodContent(scrollState = scrollState, uiState, onClickImage) { viewModel.getApodDataRandom() }
+            ApodContent(
+                scrollState = scrollState,
+                uiState,
+                navController,
+                onClick = viewModel::getApodDataRandom
+            )
         }
     }
 
@@ -55,7 +67,9 @@ fun ApodScreen(
 @Composable
 private fun ApodContent(
     scrollState: ScrollState,
-    uiState: ApodUiState, onClickImage: (url: String) -> Unit, onClick: () -> Unit
+    uiState: ApodUiState,
+    navController: NavController,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -64,7 +78,7 @@ private fun ApodContent(
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(Modifier.padding(horizontal = 16.dp)) {
-            MediaContentContainer(apodData = uiState.apodData, onClickImage = onClickImage)
+            MediaContentContainer(apodData = uiState.apodData, navController = navController)
             DescriptionAndCopyright(apodData = uiState.apodData)
         }
         GetARandomApodBtn { onClick() }
@@ -135,21 +149,42 @@ fun ProgressIndicator() {
 
 @Composable
 fun MediaContentContainer(
-    modifier: Modifier = Modifier, apodData: ApodModel?, onClickImage: (url: String) -> Unit
+    modifier: Modifier = Modifier,
+    apodData: ApodModel?,
+    navController: NavController
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
+        if (apodData?.date != null) {
+            val formatDate = remember {
+                DateTimeFormatter.ofPattern("yyyy MMMM dd").format(apodData.date)
+            }
+
+            Text(
+                text = "Picture of the day: $formatDate",
+                style = title,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                modifier = Modifier
+                    .padding(top = 16.dp, bottom = 16.dp)
+                    .fillMaxWidth()
+            )
+        }
+
         if (!apodData?.hdurl.isNullOrBlank() || !apodData?.url.isNullOrBlank()) {
             if (apodData?.media_type == "image")
                 ImageView(
                     apodData.hdurl ?: apodData.url!!,
                     apodData.title,
-                    onClickImage
+                    navController
                 )
             else
                 YouTubeView(apodData?.url)
         }
 
-        if (!apodData?.title.isNullOrBlank()) Title(modifier = Modifier, text = apodData?.title!!)
+        if (!apodData?.title.isNullOrBlank()) Title(
+            modifier = Modifier.padding(top = 16.dp),
+            text = apodData?.title!!
+        )
     }
 }
 
@@ -174,7 +209,9 @@ fun YouTubeView(url: String?) {
 
 @Composable
 private fun ImageView(
-    url: String, contentDescription: String?, onClickImage: (url: String) -> Unit
+    url: String,
+    contentDescription: String?,
+    navController: NavController
 ) {
     GlideImage(imageModel = { url },
         imageOptions = ImageOptions(
@@ -185,7 +222,7 @@ private fun ImageView(
             .defaultMinSize(minHeight = 100.dp)
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-                onClickImage(url)
+                navController.navigateToImageScreen(url)
             },
         loading = {
             ImageLoading()
@@ -230,13 +267,6 @@ private fun ImageLoading() {
 fun Title(modifier: Modifier = Modifier, text: String) {
     Row(
         modifier = modifier
-            .padding(top = 16.dp)
-            .shadow(
-                10.dp,
-                shape = RoundedCornerShape(15.dp),
-                ambientColor = card_bg,
-                spotColor = card_bg
-            )
             .clip(RoundedCornerShape(15.dp))
             .background(card_bg),
         horizontalArrangement = Arrangement.SpaceEvenly,

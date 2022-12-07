@@ -11,6 +11,7 @@ import javax.inject.Inject
 
 interface ApodRepository {
     suspend fun getApodDataRandom(): ApiResult<ApodModel>
+    suspend fun getApodToday(): ApiResult<ApodModel>
 }
 
 class ApodRepositoryImpl @Inject constructor() : ApodRepository {
@@ -27,5 +28,17 @@ class ApodRepositoryImpl @Inject constructor() : ApodRepository {
         }
     }
 
+    override suspend fun getApodToday(): ApiResult<ApodModel> {
+        return try {
+            val response = NetworkManager.getApodApi().getApodToday()
+
+            return ApiSuccess(response)
+
+        } catch (e: HttpException) {
+            ApiError(code = e.code(), message = e.message())
+        } catch (e: Throwable) {
+            ApiException(e)
+        }
+    }
 
 }

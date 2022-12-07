@@ -11,4 +11,9 @@ interface ApodApi {
         @Query("api_key") apiKey: String = NASA_KEY,
         @Query("count") count: Int = 1
     ): List<ApodModel>
+
+    @GET("/planetary/apod?")
+    suspend fun getApodToday(
+        @Query("api_key") apiKey: String = NASA_KEY,
+    ): ApodModel
 }
