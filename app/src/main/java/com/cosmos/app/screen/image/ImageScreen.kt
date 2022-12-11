@@ -3,7 +3,6 @@ package com.cosmos.app.screen.image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -11,9 +10,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -24,7 +23,7 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.roundToInt
 
 @Composable
-fun ImageScreen(url: String, onBackClick: () -> Unit){
+fun ImageScreen(url: String, onBackClick: () -> Unit) {
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
     var zoom by remember { mutableStateOf(1f) }
@@ -74,13 +73,16 @@ fun ImageScreen(url: String, onBackClick: () -> Unit){
                     })
                 }
                 .defaultMinSize(minHeight = 100.dp)
-                .padding(bottom = 20.dp)
-                .clip(RoundedCornerShape(16.dp))) {
+                .padding(bottom = 20.dp)) {
 
                 GlideImage(
                     imageModel = { url },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    imageOptions = ImageOptions(
+                        contentDescription = url,
+                        contentScale = ContentScale.FillWidth
+                    )
                 )
             }
 

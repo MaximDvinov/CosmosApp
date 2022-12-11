@@ -7,7 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.cosmos.app.screen.image.imageScreen
 import com.cosmos.app.screen.apod.apodScreen
-import com.cosmos.app.screen.apod.randomScreenRoute
+import com.cosmos.app.screen.apod.apodScreenRoute
 
 @Composable
 fun NavigationGraph(
@@ -17,7 +17,7 @@ fun NavigationGraph(
 
     NavHost(
         navController = navController,
-        startDestination = randomScreenRoute,
+        startDestination = apodScreenRoute,
         modifier = modifier,
     ) {
         apodScreen(scrollState, navController)

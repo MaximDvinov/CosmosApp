@@ -7,11 +7,13 @@ import com.cosmos.app.ApiSuccess
 import com.cosmos.app.network.NetworkManager
 import com.cosmos.app.screen.apod.model.ApodModel
 import retrofit2.HttpException
+import java.time.LocalDate
 import javax.inject.Inject
 
 interface ApodRepository {
     suspend fun getApodDataRandom(): ApiResult<ApodModel>
     suspend fun getApodToday(): ApiResult<ApodModel>
+    suspend fun getApodDate(date: LocalDate): ApiResult<ApodModel>
 }
 
 class ApodRepositoryImpl @Inject constructor() : ApodRepository {
@@ -24,6 +26,7 @@ class ApodRepositoryImpl @Inject constructor() : ApodRepository {
         } catch (e: HttpException) {
             ApiError(code = e.code(), message = e.message())
         } catch (e: Throwable) {
+            e.printStackTrace()
             ApiException(e)
         }
     }
@@ -37,8 +40,22 @@ class ApodRepositoryImpl @Inject constructor() : ApodRepository {
         } catch (e: HttpException) {
             ApiError(code = e.code(), message = e.message())
         } catch (e: Throwable) {
+            e.printStackTrace()
             ApiException(e)
         }
     }
 
+    override suspend fun getApodDate(date: LocalDate): ApiResult<ApodModel> {
+        return try {
+            val response = NetworkManager.getApodApi().getApodDate(date = date)
+
+            return ApiSuccess(response)
+
+        } catch (e: HttpException) {
+            ApiError(code = e.code(), message = e.message())
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            ApiException(e)
+        }
+    }
 }

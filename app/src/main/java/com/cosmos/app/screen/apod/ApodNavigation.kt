@@ -5,18 +5,19 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.cosmos.app.screen.apod.ui.ApodScreen
 
-const val randomScreenRoute = "random_screen"
+const val apodScreenRoute = "random_screen"
 
 fun NavController.navigateToApodScreen() {
-    this.navigate(randomScreenRoute)
+    this.navigate(apodScreenRoute)
 }
 
 fun NavGraphBuilder.apodScreen(
     scrollState: ScrollState,
     navController: NavHostController,
 ) {
-    composable(randomScreenRoute) {
+    composable(apodScreenRoute) {
         ApodScreen(scrollState = scrollState, navController = navController)
     }
 }

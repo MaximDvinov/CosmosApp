@@ -11,7 +11,7 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 interface AppModule {
     @Binds
-    fun bindsRandomScreenRepository(
-        randomRepository: ApodRepositoryImpl
+    fun bindsApodRepository(
+        apodRepository: ApodRepositoryImpl
     ): ApodRepository
 }
