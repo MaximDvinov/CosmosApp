@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -20,6 +21,7 @@ import com.commandiron.wheel_picker_compose.core.WheelPickerDefaults
 import com.cosmos.app.ui.theme.card_bg
 import com.cosmos.app.ui.theme.primary
 import com.cosmos.app.ui.theme.subTitle
+import com.cosmos.app.R
 import java.time.LocalDate
 
 @Composable
@@ -58,7 +60,7 @@ fun DatePicker(
 
                 PrimaryBtn(
                     modifier = Modifier
-                        .fillMaxWidth(), text = "Select"
+                        .fillMaxWidth(), text = stringResource(R.string.select)
                 ) {
                     onDateSelected(dateState)
                     Log.e("time", dateState.toString())

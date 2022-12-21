@@ -25,7 +25,7 @@ fun ErrorMessage(uiState: LoadState.Error<ApodModel>, onClickReload: () -> Unit)
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Error",
+                text = stringResource(R.string.error),
                 style = title,
                 textAlign = TextAlign.Center,
                 maxLines = 2,

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.cosmos.app.screen.apod.LoadState
+import com.cosmos.app.R
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -31,7 +32,7 @@ fun downloadImage(
             }
 
             override fun onLoadFailed(errorDrawable: Drawable?) {
-                onChangeState(LoadState.Error(message = "An error occurred while uploading the image."))
+                onChangeState(LoadState.Error(message = context.getString(R.string.error_uploading_image)))
             }
 
             override fun onResourceReady(
@@ -43,7 +44,7 @@ fun downloadImage(
                     saveImage(bitmap, context)
                     onChangeState(LoadState.Success())
                 } catch (e: java.lang.Exception) {
-                    onChangeState(LoadState.Error(message = "An error occurred while saving the image"))
+                    onChangeState(LoadState.Error(message = context.getString(R.string.error_saving_image)))
                 }
 
             }

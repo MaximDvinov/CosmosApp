@@ -4,4 +4,10 @@
     <string name="get_date">Date</string>
     <string name="try_again">Try again</string>
     <string name="back">back button</string>
+    <string name="error_saving_image">An error occurred while saving the image</string>
+    <string name="error_uploading_image">An error occurred while uploading the image.</string>
+    <string name="select">Select</string>
+    <string name="error">Error</string>
+    <string name="error_loading_image">Error loading the image</string>
+    <string name="picture_of_the_day">Picture of the day:</string>
 </resources>

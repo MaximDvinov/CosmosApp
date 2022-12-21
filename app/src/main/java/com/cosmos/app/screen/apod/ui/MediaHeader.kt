@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -46,7 +47,7 @@ fun MediaHeader(
             }
 
             Text(
-                text = "Picture of the day: $formatDate",
+                text = "${stringResource(R.string.picture_of_the_day)} $formatDate",
                 style = title,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
