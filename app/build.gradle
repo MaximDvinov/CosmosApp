@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.cosmos.app'
+    namespace 'com.dvinov.myspaceapp'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.cosmos.app"
+        applicationId "com.dvinov.myspaceapp"
         minSdk 26
         targetSdk 33
         versionCode 1
@@ -62,7 +62,7 @@ dependencies {
     // di
     implementation "com.google.dagger:hilt-android:2.44.2"
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-    kapt "com.google.dagger:hilt-compiler:2.44"
+    kapt "com.google.dagger:hilt-compiler:2.44.2"
 
     // internet
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
