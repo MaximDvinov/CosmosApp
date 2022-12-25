@@ -46,11 +46,7 @@ fun ApodScreen(
                 ApodContent(
                     scrollState = scrollState,
                     apodState = state,
-                    imageLoadState = uiState.imageDownloadState,
                     navController = navController,
-                    onChangeState = {
-                        viewModel.changeState(it)
-                    },
                     onRandomClick = viewModel::getApodDataRandom
                 ) { date ->
                     viewModel.getApodDate(date)
@@ -67,9 +63,7 @@ fun ApodScreen(
 private fun ApodContent(
     scrollState: ScrollState,
     apodState: LoadState.Success<ApodModel>,
-    imageLoadState: LoadState<Unit>?,
     navController: NavController,
-    onChangeState: (loadState: LoadState<Unit>) -> Unit,
     onRandomClick: () -> Unit,
     onDateClick: (LocalDate) -> Unit
 ) {
@@ -86,8 +80,6 @@ private fun ApodContent(
             MediaHeader(
                 apodState = apodState,
                 navController = navController,
-                onChangeState = onChangeState,
-                imageLoadState = imageLoadState
             )
             DescriptionAndCopyright(apodData = apodState.data)
         }

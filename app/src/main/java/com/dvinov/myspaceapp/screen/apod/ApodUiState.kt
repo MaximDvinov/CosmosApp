@@ -4,7 +4,6 @@ import com.dvinov.myspaceapp.screen.apod.model.ApodModel
 
 data class ApodUiState(
     val apodData: LoadState<ApodModel>? = null,
-    val imageDownloadState: LoadState<Unit>? = LoadState.Success()
 )
 
 sealed class LoadState<T : Any> {

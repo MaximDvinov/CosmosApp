@@ -73,8 +73,4 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
         }
     }
 
-    fun changeState(loadState: LoadState<Unit>) {
-        uiState = uiState.copy(imageDownloadState = loadState)
-    }
-
 }

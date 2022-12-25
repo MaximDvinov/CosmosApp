@@ -23,6 +23,7 @@ import com.dvinov.myspaceapp.R
 @Composable
 fun ImageView(
     url: String,
+    hdurl: String? = null,
     contentDescription: String?,
     navController: NavController
 ) {

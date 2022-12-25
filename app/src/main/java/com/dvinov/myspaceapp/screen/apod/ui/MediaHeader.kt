@@ -2,6 +2,7 @@ package com.dvinov.myspaceapp.screen.apod.ui
 
 import android.content.Context
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +11,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,15 +34,18 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import androidx.compose.runtime.setValue
 
 @Composable
 fun MediaHeader(
     modifier: Modifier = Modifier,
     navController: NavController,
-    onChangeState: (loadState: LoadState<Unit>) -> Unit,
     apodState: LoadState.Success<ApodModel>,
-    imageLoadState: LoadState<Unit>?
 ) {
+    var imageLoadState: LoadState<Unit>? by remember {
+        mutableStateOf(null)
+    }
+
     Column(modifier = modifier.fillMaxWidth()) {
         if (apodState.data?.date != null) {
             val formatDate = remember(apodState.data) {
@@ -59,7 +65,10 @@ fun MediaHeader(
 
         if (!apodState.data?.hdurl.isNullOrBlank() || !apodState.data?.url.isNullOrBlank()) {
             if (apodState.data?.media_type == "image") ImageView(
-                apodState.data.hdurl ?: apodState.data.url!!, apodState.data.title, navController
+                url = apodState.data.url!!,
+                hdurl = apodState.data.hdurl,
+                apodState.data.title,
+                navController
             )
             else YouTubeView(apodState.data?.url)
         }
@@ -70,7 +79,9 @@ fun MediaHeader(
             text = apodState.data?.title!!,
             type = apodState.data.media_type,
             url = apodState.data.url,
-            onChangeState = onChangeState
+            onChangeState = {
+                imageLoadState = it
+            }
         )
     }
 }
@@ -108,26 +119,25 @@ fun TitleOrDownloadBtn(
         )
 
 
-        if (url != null && type != "video")
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .padding(end = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                when (imageLoadState) {
-                    is LoadState.Error -> {
-                        DownloadBtn(permissionState, url, context, onChangeState)
-                    }
-                    is LoadState.Loading -> {
-                        CircularProgressIndicator(modifier = Modifier.size(25.dp), strokeWidth = 3.5.dp)
-                    }
-                    is LoadState.Success -> {
-                        DownloadBtn(permissionState, url, context, onChangeState)
-                    }
-                    else -> {}
+        if (url != null && type != "video") Box(
+            modifier = Modifier
+                .size(40.dp)
+                .padding(end = 8.dp), contentAlignment = Alignment.Center
+        ) {
+            when (imageLoadState) {
+                is LoadState.Error -> {
+                    Toast.makeText(context, imageLoadState.message, Toast.LENGTH_SHORT).show()
+                }
+                is LoadState.Loading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(25.dp), strokeWidth = 3.5.dp
+                    )
+                }
+                else -> {
+                    DownloadBtn(permissionState, url, context, onChangeState)
                 }
             }
+        }
     }
 }
 
