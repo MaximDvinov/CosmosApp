@@ -63,10 +63,9 @@ fun MediaHeader(
             )
         }
 
-        if (!apodState.data?.hdurl.isNullOrBlank() || !apodState.data?.url.isNullOrBlank()) {
-            if (apodState.data?.media_type == "image") ImageView(
+        if (!apodState.data?.url.isNullOrBlank()) {
+            if (apodState.data?.media_type == stringResource(R.string.image)) ImageView(
                 url = apodState.data.url!!,
-                hdurl = apodState.data.hdurl,
                 apodState.data.title,
                 navController
             )
@@ -78,7 +77,7 @@ fun MediaHeader(
             imageLoadState = imageLoadState,
             text = apodState.data?.title!!,
             type = apodState.data.media_type,
-            url = apodState.data.url,
+            url = apodState.data.hdurl ?: apodState.data.url,
             onChangeState = {
                 imageLoadState = it
             }
@@ -119,7 +118,7 @@ fun TitleOrDownloadBtn(
         )
 
 
-        if (url != null && type != "video") Box(
+        if (url != null && type != stringResource(R.string.video)) Box(
             modifier = Modifier
                 .size(40.dp)
                 .padding(end = 8.dp), contentAlignment = Alignment.Center

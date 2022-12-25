@@ -10,4 +10,6 @@
     <string name="error">Error</string>
     <string name="error_loading_image">Error loading the image</string>
     <string name="picture_of_the_day">Picture of the day:</string>
+    <string name="image">image</string>
+    <string name="video">video</string>
 </resources>
