@@ -9,22 +9,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.dvinov.myspaceapp.screen.image.navigateToImageScreen
-import com.dvinov.myspaceapp.ui.theme.card_bg
-import com.dvinov.myspaceapp.ui.theme.title
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import com.dvinov.myspaceapp.R
+import com.dvinov.myspaceapp.ui.theme.*
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.placeholder
+import com.google.accompanist.placeholder.shimmer
 
 @Composable
 fun ImageView(
-    url: String,
-    contentDescription: String?,
-    navController: NavController
+    url: String, contentDescription: String?, navController: NavController
 ) {
     GlideImage(imageModel = { url },
         imageOptions = ImageOptions(
@@ -69,9 +71,13 @@ private fun ImageLoading() {
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .background(card_bg)
-            .clip(RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center
-    ) {
-        ProgressIndicator()
-    }
+            .placeholder(
+                visible = true,
+                color = card_bg,
+                shape = RoundedCornerShape(16.dp),
+                highlight = PlaceholderHighlight.shimmer(
+                    highlightColor = primary.copy(alpha = 0.3f),
+                ),
+            )
+    )
 }

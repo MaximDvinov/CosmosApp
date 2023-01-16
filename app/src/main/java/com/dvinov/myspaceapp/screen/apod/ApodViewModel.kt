@@ -17,9 +17,12 @@ import java.net.UnknownHostException
 import java.time.LocalDate
 import javax.inject.Inject
 
+
+private const val TAG = "ApodViewModel"
+
 @HiltViewModel
 class ApodViewModel @Inject constructor(private val repository: ApodRepository) : ViewModel() {
-    var uiState by mutableStateOf(ApodUiState(null))
+    var uiState by mutableStateOf(ApodUiState(null, LocalDate.now()))
         private set
 
     fun getApodDataRandom() {
@@ -38,39 +41,43 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
         }
     }
 
-    fun getApodDate(date: LocalDate) {
+    fun selectDate(date: LocalDate) {
+        uiState = uiState.copy(selectedDate = date)
+    }
+
+    fun getApodDate() {
         uiState = uiState.copy(apodData = LoadState.Loading())
 
         viewModelScope.launch {
-            uiState = getUiState(repository.getApodDate(date))
+            if (uiState.selectedDate != null) {
+                uiState = getUiState(repository.getApodDate(uiState.selectedDate!!))
+            }
         }
     }
 
-    private  fun getUiState(result: ApiResult<ApodModel>) = when (result) {
+    private fun getUiState(result: ApiResult<ApodModel>) = when (result) {
         is ApiError -> {
-            Log.e("getApod", result.message.toString())
+            Log.e(TAG, "getUiState: ${result.message}")
+
             uiState.copy(
                 apodData = LoadState.Error(
                     code = result.code, message = result.message
                 )
             )
-
         }
         is ApiException -> {
-            Log.e("getApod", result.e.message.toString())
+            Log.e(TAG, "getUiState: ${result.e.message}", result.e)
+
             if (result.e is UnknownHostException) {
                 uiState.copy(apodData = LoadState.Error(message = "No internet connection"))
             } else {
                 uiState.copy(apodData = LoadState.Error(message = result.e.message.toString()))
             }
-
-
         }
         is ApiSuccess -> {
-            Log.e("getApod", "Success")
+            Log.i(TAG, "getUiState: success")
             uiState.copy(apodData = LoadState.Success(result.data))
 
         }
     }
-
 }

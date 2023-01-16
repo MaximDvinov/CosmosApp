@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
 }
@@ -13,8 +14,8 @@ android {
         applicationId "com.dvinov.myspaceapp"
         minSdk 26
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 7
+        versionName "2.02"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -84,6 +85,8 @@ dependencies {
     // accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
     implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-placeholder:$accompanist_version"
+
 
     // animation (lottie)
     implementation "com.airbnb.android:lottie-compose:5.2.0"

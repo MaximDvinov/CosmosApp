@@ -18,22 +18,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.commandiron.wheel_picker_compose.WheelDatePicker
 import com.commandiron.wheel_picker_compose.core.WheelPickerDefaults
+import com.dvinov.myspaceapp.R
 import com.dvinov.myspaceapp.ui.theme.card_bg
 import com.dvinov.myspaceapp.ui.theme.primary
 import com.dvinov.myspaceapp.ui.theme.subTitle
 import java.time.LocalDate
-import com.dvinov.myspaceapp.R
 
+private const val TAG = "DatePicker"
 @Composable
 fun DatePicker(
-    showDialog: Boolean, onChangeState: (Boolean) -> Unit, onDateSelected: (date: LocalDate) -> Unit
+    showDialog: Boolean,
+    onChangeShowState: (Boolean) -> Unit,
+    onDateSelected: (date: LocalDate) -> Unit,
+    selectedDate: LocalDate? = null,
+    onChangeDateState: (date: LocalDate) -> Unit
 ) {
     var dateState by remember {
-        mutableStateOf(LocalDate.now())
+        mutableStateOf(selectedDate ?: LocalDate.now())
     }
 
+    Log.i(TAG, "DatePicker: $selectedDate")
+
     if (showDialog) {
-        Dialog(onDismissRequest = { onChangeState(false) }) {
+        Dialog(onDismissRequest = { onChangeShowState(false) }) {
             Column(
                 Modifier
                     .clip(RoundedCornerShape(16.dp))
@@ -43,7 +50,7 @@ fun DatePicker(
             ) {
                 WheelDatePicker(
                     modifier = Modifier.padding(16.dp),
-                    startDate = LocalDate.now(),
+                    startDate = dateState,
                     yearsRange = IntRange(1996, LocalDate.now().year),
                     size = DpSize(220.dp, 150.dp),
                     textStyle = subTitle,
@@ -55,7 +62,9 @@ fun DatePicker(
                         border = BorderStroke(2.dp, primary)
                     )
                 ) { snappedDate ->
-                        dateState = snappedDate
+                    dateState = snappedDate
+                    onChangeDateState(snappedDate)
+                    Log.d(TAG, "DatePicker() called with: snappedDate = $snappedDate")
                 }
 
                 PrimaryBtn(
@@ -63,8 +72,7 @@ fun DatePicker(
                         .fillMaxWidth(), text = stringResource(R.string.select)
                 ) {
                     onDateSelected(dateState)
-                    Log.e("time", dateState.toString())
-                    onChangeState(false)
+                    onChangeShowState(false)
                 }
             }
         }

@@ -47,9 +47,11 @@ fun ApodScreen(
                     scrollState = scrollState,
                     apodState = state,
                     navController = navController,
-                    onRandomClick = viewModel::getApodDataRandom
-                ) { date ->
-                    viewModel.getApodDate(date)
+                    selectedDate = uiState.selectedDate,
+                    onRandomClick = viewModel::getApodDataRandom,
+                    onChangeDateState = viewModel::selectDate
+                ) {
+                    viewModel.getApodDate()
                 }
             }
             else -> {
@@ -64,10 +66,11 @@ private fun ApodContent(
     scrollState: ScrollState,
     apodState: LoadState.Success<ApodModel>,
     navController: NavController,
+    onChangeDateState: (date: LocalDate) -> Unit,
     onRandomClick: () -> Unit,
-    onDateClick: (LocalDate) -> Unit
+    selectedDate: LocalDate?,
+    onDateClick: () -> Unit
 ) {
-
     var showDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -84,11 +87,15 @@ private fun ApodContent(
             DescriptionAndCopyright(apodData = apodState.data)
         }
 
-        DatePicker(showDialog = showDialog,
-            onChangeState = { showDialog = it },
+        DatePicker(
+            showDialog = showDialog,
+            onChangeShowState = { showDialog = it },
+            selectedDate = selectedDate,
+            onChangeDateState = onChangeDateState,
             onDateSelected = {
-                onDateClick(it)
-            })
+                onDateClick()
+            }
+        )
 
         Row(modifier = Modifier.padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)) {
             PrimaryBtn(

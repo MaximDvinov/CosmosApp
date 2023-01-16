@@ -1,9 +1,11 @@
 package com.dvinov.myspaceapp.screen.apod
 
 import com.dvinov.myspaceapp.screen.apod.model.ApodModel
+import java.time.LocalDate
 
 data class ApodUiState(
     val apodData: LoadState<ApodModel>? = null,
+    val selectedDate: LocalDate? = null,
 )
 
 sealed class LoadState<T : Any> {
