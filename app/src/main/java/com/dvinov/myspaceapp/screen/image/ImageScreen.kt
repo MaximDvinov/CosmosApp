@@ -1,5 +1,7 @@
 package com.dvinov.myspaceapp.screen.image
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
@@ -18,6 +20,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.dvinov.myspaceapp.R
+import com.dvinov.myspaceapp.getDominantColor
+import com.dvinov.myspaceapp.ui.theme.blue_bg
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.roundToInt
@@ -28,11 +32,21 @@ fun ImageScreen(url: String, onBackClick: () -> Unit) {
     var offsetY by remember { mutableStateOf(0f) }
     var zoom by remember { mutableStateOf(1f) }
 
-    Box(contentAlignment = Alignment.TopStart) {
-        IconButton(onClick = { onBackClick() }, modifier = Modifier.zIndex(10f)) {
+    var dominantColor by remember { mutableStateOf(blue_bg) }
+    val dominantColorAnimated = animateColorAsState(targetValue = dominantColor)
+
+    Box(
+        contentAlignment = Alignment.TopStart, modifier = Modifier
+            .background(
+                color = dominantColorAnimated.value.copy(0.5f),
+            )
+            .systemBarsPadding()
+    ) {
+        IconButton(
+            onClick = { onBackClick() }, modifier = Modifier.zIndex(10f)
+        ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = stringResource(
+                imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(
                     id = R.string.back
                 )
             )
@@ -49,8 +63,7 @@ fun ImageScreen(url: String, onBackClick: () -> Unit) {
                         offsetX += x
                         offsetY += y
                     }
-                },
-            contentAlignment = Alignment.Center
+                }, contentAlignment = Alignment.Center
         ) {
             Box(modifier = Modifier
                 .fillMaxWidth()
@@ -75,15 +88,14 @@ fun ImageScreen(url: String, onBackClick: () -> Unit) {
                 .defaultMinSize(minHeight = 100.dp)
                 .padding(bottom = 20.dp)) {
 
-                GlideImage(
-                    imageModel = { url },
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                GlideImage(imageModel = { url },
+                    modifier = Modifier.fillMaxWidth(),
                     imageOptions = ImageOptions(
-                        contentDescription = url,
-                        contentScale = ContentScale.FillWidth
-                    )
-                )
+                        contentDescription = url, contentScale = ContentScale.FillWidth
+                    ),
+                    onImageStateChanged = {
+                        dominantColor = getDominantColor(it)
+                    })
             }
 
         }

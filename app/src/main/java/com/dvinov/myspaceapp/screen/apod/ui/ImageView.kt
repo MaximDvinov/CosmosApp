@@ -9,26 +9,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.dvinov.myspaceapp.screen.image.navigateToImageScreen
-import com.skydoves.landscapist.ImageOptions
-import com.skydoves.landscapist.glide.GlideImage
 import com.dvinov.myspaceapp.R
-import com.dvinov.myspaceapp.ui.theme.*
+import com.dvinov.myspaceapp.screen.image.navigateToImageScreen
+import com.dvinov.myspaceapp.ui.theme.card_bg
+import com.dvinov.myspaceapp.ui.theme.primary
+import com.dvinov.myspaceapp.ui.theme.title
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
+import com.skydoves.landscapist.ImageOptions
+import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.glide.GlideImageState
 
 @Composable
 fun ImageView(
-    url: String, contentDescription: String?, navController: NavController
+    url: String,
+    contentDescription: String?,
+    navController: NavController,
+    onChangeColor: (image: GlideImageState) -> Unit
 ) {
     GlideImage(imageModel = { url },
+        onImageStateChanged = onChangeColor,
         imageOptions = ImageOptions(
             contentDescription = contentDescription, contentScale = ContentScale.FillWidth
         ),

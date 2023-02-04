@@ -10,39 +10,38 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.dvinov.myspaceapp.screen.apod.model.ApodModel
-import com.dvinov.myspaceapp.ui.theme.card_bg
-import com.dvinov.myspaceapp.ui.theme.title
-import java.time.format.DateTimeFormatter
-import com.dvinov.myspaceapp.downloadImage
-import com.dvinov.myspaceapp.screen.apod.LoadState
 import com.dvinov.myspaceapp.R
+import com.dvinov.myspaceapp.downloadImage
+import com.dvinov.myspaceapp.screen.apod.LoadResult
+import com.dvinov.myspaceapp.screen.apod.model.ApodModel
+import com.dvinov.myspaceapp.ui.theme.title
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import androidx.compose.runtime.setValue
+import com.skydoves.landscapist.glide.GlideImageState
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MediaHeader(
     modifier: Modifier = Modifier,
     navController: NavController,
-    apodState: LoadState.Success<ApodModel>,
+    apodState: LoadResult.Success<ApodModel>,
+    color: Color,
+    onChangeColor: (image: GlideImageState) -> Unit,
 ) {
-    var imageLoadState: LoadState<Unit>? by remember {
+    var imageLoadState: LoadResult<Unit>? by remember {
         mutableStateOf(null)
     }
 
@@ -67,7 +66,8 @@ fun MediaHeader(
             if (apodState.data?.media_type == stringResource(R.string.image)) ImageView(
                 url = apodState.data.url!!,
                 apodState.data.title,
-                navController
+                navController,
+                onChangeColor = onChangeColor
             )
             else YouTubeView(apodState.data?.url)
         }
@@ -80,7 +80,8 @@ fun MediaHeader(
             url = apodState.data.hdurl ?: apodState.data.url,
             onChangeState = {
                 imageLoadState = it
-            }
+            },
+            color = color
         )
     }
 }
@@ -90,11 +91,12 @@ fun MediaHeader(
 @Composable
 fun TitleOrDownloadBtn(
     modifier: Modifier = Modifier,
-    onChangeState: (loadState: LoadState<Unit>) -> Unit,
+    onChangeState: (loadState: LoadResult<Unit>) -> Unit,
     text: String,
     url: String?,
     type: String?,
-    imageLoadState: LoadState<Unit>?
+    imageLoadState: LoadResult<Unit>?,
+    color: Color
 ) {
     val permissionState = rememberPermissionState(
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -105,7 +107,7 @@ fun TitleOrDownloadBtn(
         modifier = modifier
             .clip(RoundedCornerShape(15.dp))
             .padding()
-            .background(card_bg),
+            .background(color),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -124,10 +126,10 @@ fun TitleOrDownloadBtn(
                 .padding(end = 8.dp), contentAlignment = Alignment.Center
         ) {
             when (imageLoadState) {
-                is LoadState.Error -> {
+                is LoadResult.Error -> {
                     Toast.makeText(context, imageLoadState.message, Toast.LENGTH_SHORT).show()
                 }
-                is LoadState.Loading -> {
+                is LoadResult.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.size(25.dp), strokeWidth = 3.5.dp
                     )
@@ -146,7 +148,7 @@ private fun DownloadBtn(
     permissionState: PermissionState,
     url: String,
     context: Context,
-    onChangeState: (loadState: LoadState<Unit>) -> Unit
+    onChangeState: (loadState: LoadResult<Unit>) -> Unit
 ) {
     IconButton(
         onClick = {

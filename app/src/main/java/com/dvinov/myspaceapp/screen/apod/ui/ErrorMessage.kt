@@ -7,14 +7,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.dvinov.myspaceapp.screen.apod.LoadState
+import com.dvinov.myspaceapp.screen.apod.LoadResult
 import com.dvinov.myspaceapp.screen.apod.model.ApodModel
 import com.dvinov.myspaceapp.ui.theme.description
 import com.dvinov.myspaceapp.ui.theme.title
 import com.dvinov.myspaceapp.R
 
 @Composable
-fun ErrorMessage(uiState: LoadState.Error<ApodModel>, onClickReload: () -> Unit) {
+fun ErrorMessage(uiState: LoadResult.Error<ApodModel>, onClickReload: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()

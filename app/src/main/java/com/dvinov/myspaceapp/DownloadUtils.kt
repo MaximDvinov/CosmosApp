@@ -12,7 +12,7 @@ import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.dvinov.myspaceapp.screen.apod.LoadState
+import com.dvinov.myspaceapp.screen.apod.LoadResult
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -21,17 +21,17 @@ import java.io.OutputStream
 fun downloadImage(
     imageURL: String,
     context: Context,
-    onChangeState: (loadState: LoadState<Unit>) -> Unit
+    onChangeState: (loadState: LoadResult<Unit>) -> Unit
 ) {
     Glide.with(context)
         .load(imageURL)
         .into(object : CustomTarget<Drawable?>() {
             override fun onLoadStarted(placeholder: Drawable?) {
-                onChangeState(LoadState.Loading())
+                onChangeState(LoadResult.Loading())
             }
 
             override fun onLoadFailed(errorDrawable: Drawable?) {
-                onChangeState(LoadState.Error(message = context.getString(R.string.error_uploading_image)))
+                onChangeState(LoadResult.Error(message = context.getString(R.string.error_uploading_image)))
             }
 
             override fun onResourceReady(
@@ -41,9 +41,9 @@ fun downloadImage(
                 try {
                     val bitmap = (resource as BitmapDrawable).bitmap
                     saveImage(bitmap, context)
-                    onChangeState(LoadState.Success())
+                    onChangeState(LoadResult.Success())
                 } catch (e: java.lang.Exception) {
-                    onChangeState(LoadState.Error(message = context.getString(R.string.error_saving_image)))
+                    onChangeState(LoadResult.Error(message = context.getString(R.string.error_saving_image)))
                 }
 
             }

@@ -4,12 +4,12 @@ import com.dvinov.myspaceapp.screen.apod.model.ApodModel
 import java.time.LocalDate
 
 data class ApodUiState(
-    val apodData: LoadState<ApodModel>? = null,
+    val apodData: LoadResult<ApodModel>? = null,
     val selectedDate: LocalDate? = null,
 )
 
-sealed class LoadState<T : Any> {
-    class Success<T : Any>(val data: T? = null) : LoadState<T>()
-    class Error<T : Any>(val code: Int? = null, val message: String? = null) : LoadState<T>()
-    class Loading<T : Any> : LoadState<T>()
+sealed class LoadResult<T : Any> {
+    class Success<T : Any>(val data: T? = null) : LoadResult<T>()
+    class Error<T : Any>(val code: Int? = null, val message: String? = null) : LoadResult<T>()
+    class Loading<T : Any> : LoadResult<T>()
 }
