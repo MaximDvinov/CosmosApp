@@ -30,6 +30,7 @@ fun ImageView(
     url: String,
     contentDescription: String?,
     navController: NavController,
+    modifier: Modifier = Modifier,
     onChangeColor: (image: GlideImageState) -> Unit
 ) {
     GlideImage(imageModel = { url },
@@ -37,7 +38,7 @@ fun ImageView(
         imageOptions = ImageOptions(
             contentDescription = contentDescription, contentScale = ContentScale.FillWidth
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 100.dp)
             .clip(RoundedCornerShape(16.dp))

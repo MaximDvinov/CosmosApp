@@ -14,8 +14,8 @@ android {
         applicationId "com.dvinov.myspaceapp"
         minSdk 26
         targetSdk 33
-        versionCode 7
-        versionName "2.02"
+        versionCode 9
+        versionName "2.51"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -110,7 +110,7 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 
     // data picker
-    implementation 'com.github.commandiron:WheelPickerCompose:1.1.6'
+    implementation 'com.github.commandiron:WheelPickerCompose:1.1.9'
 }
 
 kapt {

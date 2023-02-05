@@ -1,9 +1,6 @@
 package com.dvinov.myspaceapp.screen.apod
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dvinov.myspaceapp.ApiError
@@ -12,6 +9,9 @@ import com.dvinov.myspaceapp.ApiResult
 import com.dvinov.myspaceapp.ApiSuccess
 import com.dvinov.myspaceapp.screen.apod.model.ApodModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 import java.time.LocalDate
@@ -22,44 +22,48 @@ private const val TAG = "ApodViewModel"
 
 @HiltViewModel
 class ApodViewModel @Inject constructor(private val repository: ApodRepository) : ViewModel() {
-    var uiState by mutableStateOf(ApodUiState(null, LocalDate.now()))
-        private set
+    private val _uiState = MutableStateFlow(ApodUiState(null, LocalDate.now()))
+    val uiState: StateFlow<ApodUiState> = _uiState.asStateFlow()
 
     fun getApodDataRandom() {
-        uiState = uiState.copy(apodData = LoadResult.Loading())
+        _uiState.value = _uiState.value.copy(apodData = LoadResult.Loading())
 
         viewModelScope.launch {
-            uiState = getUiState(repository.getApodDataRandom())
+            _uiState.value = getUiState(repository.getApodDataRandom())
         }
     }
 
     fun getApodToday() {
-        uiState = uiState.copy(apodData = LoadResult.Loading())
+        _uiState.value = _uiState.value.copy(apodData = LoadResult.Loading())
 
         viewModelScope.launch {
-            uiState = getUiState(repository.getApodToday())
+            _uiState.value = getUiState(repository.getApodToday())
         }
     }
 
     fun selectDate(date: LocalDate) {
-        uiState = uiState.copy(selectedDate = date)
+        _uiState.value = _uiState.value.copy(selectedDate = date)
     }
 
     fun getApodDate() {
-        uiState = uiState.copy(apodData = LoadResult.Loading())
+        _uiState.value = _uiState.value.copy(apodData = LoadResult.Loading())
 
         viewModelScope.launch {
-            if (uiState.selectedDate != null) {
-                uiState = getUiState(repository.getApodDate(uiState.selectedDate!!))
+            if (_uiState.value.selectedDate != null) {
+                _uiState.value = getUiState(repository.getApodDate(_uiState.value.selectedDate!!))
             }
         }
+    }
+
+    fun changeShowDialog(isShowDialog: Boolean){
+        _uiState.value = _uiState.value.copy(isShowDialog = isShowDialog)
     }
 
     private fun getUiState(result: ApiResult<ApodModel>) = when (result) {
         is ApiError -> {
             Log.e(TAG, "getUiState: ${result.message}")
 
-            uiState.copy(
+            _uiState.value.copy(
                 apodData = LoadResult.Error(
                     code = result.code, message = result.message
                 )
@@ -69,14 +73,17 @@ class ApodViewModel @Inject constructor(private val repository: ApodRepository) 
             Log.e(TAG, "getUiState: ${result.e.message}", result.e)
 
             if (result.e is UnknownHostException) {
-                uiState.copy(apodData = LoadResult.Error(message = "No internet connection"))
+                _uiState.value.copy(apodData = LoadResult.Error(message = "No internet connection"))
             } else {
-                uiState.copy(apodData = LoadResult.Error(message = result.e.message.toString()))
+                _uiState.value.copy(apodData = LoadResult.Error(message = result.e.message.toString()))
             }
         }
         is ApiSuccess -> {
             Log.i(TAG, "getUiState: success")
-            uiState.copy(apodData = LoadResult.Success(result.data), selectedDate = result.data?.date)
+            _uiState.value.copy(
+                apodData = LoadResult.Success(result.data),
+                selectedDate = result.data?.date
+            )
         }
     }
 }

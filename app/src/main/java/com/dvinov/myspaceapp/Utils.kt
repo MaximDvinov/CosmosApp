@@ -1,7 +1,15 @@
 package com.dvinov.myspaceapp
 
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
 import com.dvinov.myspaceapp.ui.theme.blue_bg
 import com.skydoves.landscapist.glide.GlideImageState
@@ -28,11 +36,13 @@ fun getDominantColor(state: GlideImageState) =
         is GlideImageState.None -> blue_bg
         is GlideImageState.Success -> {
             if (state.imageBitmap != null) {
-                val tmpColor = Palette.from(state.imageBitmap!!.asAndroidBitmap())
-                    .generate().dominantSwatch?.rgb
+                val palette = Palette.from(state.imageBitmap!!.asAndroidBitmap()).generate()
+                val tmpColor = palette.darkVibrantSwatch?.rgb ?: palette.mutedSwatch?.rgb
+                ?: palette.vibrantSwatch?.rgb ?: palette.dominantSwatch?.rgb
                 if (tmpColor != null) Color(
                     tmpColor
                 ) else blue_bg
             } else blue_bg
         }
     }
+

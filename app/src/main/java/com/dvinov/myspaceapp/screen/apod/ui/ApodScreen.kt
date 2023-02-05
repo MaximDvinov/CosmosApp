@@ -23,7 +23,6 @@ import com.dvinov.myspaceapp.screen.apod.LoadResult
 import com.dvinov.myspaceapp.screen.apod.model.ApodModel
 import com.dvinov.myspaceapp.ui.theme.blue_bg
 import com.skydoves.landscapist.glide.GlideImageState
-import java.time.LocalDate
 
 @Composable
 fun ApodScreen(
@@ -31,7 +30,8 @@ fun ApodScreen(
     viewModel: ApodViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
-    val uiState = viewModel.uiState
+    val uiState by viewModel.uiState.collectAsState()
+    val showDialog = uiState.isShowDialog
 
     LaunchedEffect(Unit) {
         if (uiState.apodData == null) viewModel.getApodToday()
@@ -52,18 +52,21 @@ fun ApodScreen(
                     scrollState = scrollState,
                     apodState = state,
                     navController = navController,
-                    selectedDate = uiState.selectedDate,
                     onRandomClick = viewModel::getApodDataRandom,
-                    onChangeDateState = viewModel::selectDate
-                ) {
-                    viewModel.getApodDate()
-                }
+                    onShowDialog = viewModel::changeShowDialog
+                )
             }
-            else -> {
-
-            }
+            null -> {}
         }
     }
+
+    DatePicker(
+        showDialog = showDialog,
+        selectedDate = uiState.selectedDate,
+        onChangeShowState = viewModel::changeShowDialog,
+        onChangeDateState = viewModel::selectDate,
+        onDateSelected = viewModel::getApodDate
+    )
 }
 
 @Composable
@@ -71,12 +74,9 @@ private fun ApodContent(
     scrollState: ScrollState,
     apodState: LoadResult.Success<ApodModel>,
     navController: NavController,
-    onChangeDateState: (date: LocalDate) -> Unit,
     onRandomClick: () -> Unit,
-    selectedDate: LocalDate?,
-    onDateClick: () -> Unit
+    onShowDialog: (Boolean) -> Unit,
 ) {
-    var showDialog by remember { mutableStateOf(false) }
     var dominantColor by remember { mutableStateOf(blue_bg) }
     val dominantColorAnimated = animateColorAsState(targetValue = dominantColor)
 
@@ -105,22 +105,18 @@ private fun ApodContent(
             DescriptionAndCopyright(apodData = apodState.data)
         }
 
-        DatePicker(showDialog = showDialog,
-            onChangeShowState = { showDialog = it },
-            selectedDate = selectedDate,
-            onChangeDateState = onChangeDateState,
-            onDateSelected = {
-                onDateClick()
-            })
-
         Row(modifier = Modifier.padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)) {
             PrimaryBtn(
-                modifier = Modifier.weight(2f), text = stringResource(id = R.string.get_a_random)
-            ) { onRandomClick() }
+                modifier = Modifier.weight(2f), text = stringResource(id = R.string.get_a_random),
+                onClick = onRandomClick
+            )
             Divider(color = Color.Transparent, modifier = Modifier.width(16.dp))
             SecondaryBtn(
-                modifier = Modifier.weight(1f), text = stringResource(id = R.string.get_date)
-            ) { showDialog = true }
+                modifier = Modifier.weight(1f), text = stringResource(id = R.string.get_date),
+                onClick = remember {
+                    { onShowDialog(true) }
+                }
+            )
         }
     }
 }

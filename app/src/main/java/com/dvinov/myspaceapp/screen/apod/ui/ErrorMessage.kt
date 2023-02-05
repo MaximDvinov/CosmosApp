@@ -19,6 +19,7 @@ fun ErrorMessage(uiState: LoadResult.Error<ApodModel>, onClickReload: () -> Unit
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .systemBarsPadding()
     ) {
         Column(
             modifier = Modifier.weight(1f),

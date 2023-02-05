@@ -6,6 +6,7 @@ import java.time.LocalDate
 data class ApodUiState(
     val apodData: LoadResult<ApodModel>? = null,
     val selectedDate: LocalDate? = null,
+    val isShowDialog: Boolean = false
 )
 
 sealed class LoadResult<T : Any> {

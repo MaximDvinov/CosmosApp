@@ -25,11 +25,12 @@ import com.dvinov.myspaceapp.ui.theme.subTitle
 import java.time.LocalDate
 
 private const val TAG = "DatePicker"
+
 @Composable
 fun DatePicker(
     showDialog: Boolean,
     onChangeShowState: (Boolean) -> Unit,
-    onDateSelected: (date: LocalDate) -> Unit,
+    onDateSelected: () -> Unit,
     selectedDate: LocalDate? = null,
     onChangeDateState: (date: LocalDate) -> Unit
 ) {
@@ -40,7 +41,7 @@ fun DatePicker(
     Log.i(TAG, "DatePicker: $selectedDate")
 
     if (showDialog) {
-        Dialog(onDismissRequest = { onChangeShowState(false) }) {
+        Dialog(onDismissRequest = remember { { onChangeShowState(false) } }) {
             Column(
                 Modifier
                     .clip(RoundedCornerShape(16.dp))
@@ -51,7 +52,9 @@ fun DatePicker(
                 WheelDatePicker(
                     modifier = Modifier.padding(16.dp),
                     startDate = dateState,
-                    yearsRange = IntRange(1996, LocalDate.now().year),
+                    minDate = LocalDate.of(1995, 7, 1),
+                    maxDate = LocalDate.now(),
+                    yearsRange = IntRange(1995, LocalDate.now().year),
                     size = DpSize(220.dp, 150.dp),
                     textStyle = subTitle,
                     textColor = Color.White,
@@ -60,20 +63,26 @@ fun DatePicker(
                         shape = RoundedCornerShape(16.dp),
                         color = primary.copy(alpha = 0.1f),
                         border = BorderStroke(2.dp, primary)
-                    )
-                ) { snappedDate ->
-                    dateState = snappedDate
-                    onChangeDateState(snappedDate)
-                    Log.d(TAG, "DatePicker() called with: snappedDate = $snappedDate")
-                }
+                    ),
+                    onSnappedDate = remember {
+                        { snappedDate ->
+                            dateState = snappedDate
+                            onChangeDateState(snappedDate)
+                            Log.d(TAG, "DatePicker() called with: snappedDate = $snappedDate")
+                        }
+                    }
+                )
 
                 PrimaryBtn(
                     modifier = Modifier
-                        .fillMaxWidth(), text = stringResource(R.string.select)
-                ) {
-                    onDateSelected(dateState)
-                    onChangeShowState(false)
-                }
+                        .fillMaxWidth(), text = stringResource(R.string.select),
+                    onClick = remember {
+                        {
+                            onDateSelected()
+                            onChangeShowState(false)
+                        }
+                    }
+                )
             }
         }
     }
