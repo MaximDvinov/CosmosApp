@@ -25,5 +25,4 @@ fun DescriptionAndCopyright(apodData: ApodModel?) {
             modifier = Modifier.padding(vertical = 4.dp)
         )
     }
-
 }

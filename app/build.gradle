@@ -14,8 +14,8 @@ android {
         applicationId "com.dvinov.myspaceapp"
         minSdk 26
         targetSdk 33
-        versionCode 9
-        versionName "2.51"
+        versionCode 10
+        versionName "2.52"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

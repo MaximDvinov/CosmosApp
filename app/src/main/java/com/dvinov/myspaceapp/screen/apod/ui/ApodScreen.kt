@@ -4,11 +4,14 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -22,6 +25,8 @@ import com.dvinov.myspaceapp.screen.apod.ApodViewModel
 import com.dvinov.myspaceapp.screen.apod.LoadResult
 import com.dvinov.myspaceapp.screen.apod.model.ApodModel
 import com.dvinov.myspaceapp.ui.theme.blue_bg
+import com.dvinov.myspaceapp.ui.theme.white
+import com.dvinov.myspaceapp.ui.theme.white_alpha
 import com.skydoves.landscapist.glide.GlideImageState
 
 @Composable
@@ -31,13 +36,15 @@ fun ApodScreen(
     navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val apodData = uiState.apodData
     val showDialog = uiState.isShowDialog
+    val selectedDate = uiState.selectedDate
 
     LaunchedEffect(Unit) {
-        if (uiState.apodData == null) viewModel.getApodToday()
+        if (apodData == null) viewModel.getApodToday()
     }
 
-    Crossfade(targetState = uiState.apodData) { state ->
+    Crossfade(targetState = apodData) { state ->
         when (state) {
             is LoadResult.Error -> {
                 ErrorMessage(
@@ -62,7 +69,7 @@ fun ApodScreen(
 
     DatePicker(
         showDialog = showDialog,
-        selectedDate = uiState.selectedDate,
+        selectedDate = selectedDate,
         onChangeShowState = viewModel::changeShowDialog,
         onChangeDateState = viewModel::selectDate,
         onDateSelected = viewModel::getApodDate
@@ -98,21 +105,38 @@ private fun ApodContent(
             MediaHeader(
                 apodState = apodState,
                 navController = navController,
-                color = dominantColorAnimated.value.copy(0.9f)
-            ) { state: GlideImageState ->
-                dominantColor = getDominantColor(state)
+                color = dominantColorAnimated.value.copy(0.5f)
+            ) { color: Color ->
+                dominantColor = color
             }
             DescriptionAndCopyright(apodData = apodState.data)
         }
 
         Row(modifier = Modifier.padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)) {
-            PrimaryBtn(
-                modifier = Modifier.weight(2f), text = stringResource(id = R.string.get_a_random),
+            ColoredBtn(
+                modifier = Modifier
+                    .weight(2f)
+                    .border(
+                        width = (0.5).dp,
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                white.copy(0.3f), white.copy(0.2f)
+                            ),
+                            start = Offset.Zero,
+                            end = Offset.Infinite
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                text = stringResource(id = R.string.get_a_random),
+                color = white.copy(alpha = 0.2f),
                 onClick = onRandomClick
             )
+
             Divider(color = Color.Transparent, modifier = Modifier.width(16.dp))
-            SecondaryBtn(
+
+            ColoredBtn(
                 modifier = Modifier.weight(1f), text = stringResource(id = R.string.get_date),
+                color = white.copy(alpha = 0.1f),
                 onClick = remember {
                     { onShowDialog(true) }
                 }

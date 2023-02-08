@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +32,10 @@ fun ImageView(
     contentDescription: String?,
     navController: NavController,
     modifier: Modifier = Modifier,
-    onChangeColor: (image: GlideImageState) -> Unit
+    onChangeState: (image: GlideImageState) -> Unit
 ) {
     GlideImage(imageModel = { url },
-        onImageStateChanged = onChangeColor,
+        onImageStateChanged = onChangeState,
         imageOptions = ImageOptions(
             contentDescription = contentDescription, contentScale = ContentScale.FillWidth
         ),
@@ -42,14 +43,20 @@ fun ImageView(
             .fillMaxWidth()
             .defaultMinSize(minHeight = 100.dp)
             .clip(RoundedCornerShape(16.dp))
-            .clickable {
-                navController.navigateToImageScreen(url)
-            },
-        loading = {
-            ImageLoading()
+            .clickable(onClick = remember {
+                {
+                    navController.navigateToImageScreen(url)
+                }
+            }),
+        loading = remember {
+            {
+                ImageLoading()
+            }
         },
-        failure = {
-            ImageError(text = stringResource(R.string.error_loading_image))
+        failure = remember {
+            {
+                ImageError(text = stringResource(R.string.error_loading_image))
+            }
         })
 }
 

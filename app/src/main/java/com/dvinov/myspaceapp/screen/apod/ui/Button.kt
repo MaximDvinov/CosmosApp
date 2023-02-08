@@ -22,14 +22,9 @@ fun ColoredBtn(modifier: Modifier = Modifier, color: Color, text: String, onClic
     Button(
         onClick = onClick,
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .shadow(
-                10.dp,
-                shape = RoundedCornerShape(15.dp),
-                ambientColor = primary,
-                spotColor = primary
-            ),
-        colors = ButtonDefaults.buttonColors(backgroundColor = color)
+            .clip(RoundedCornerShape(16.dp)),
+        colors = ButtonDefaults.buttonColors(backgroundColor = color),
+        elevation = ButtonDefaults.elevation(0.dp, pressedElevation = 0.dp, hoveredElevation = 0.dp, focusedElevation = 0.dp)
     ) {
         Text(
             text = text,

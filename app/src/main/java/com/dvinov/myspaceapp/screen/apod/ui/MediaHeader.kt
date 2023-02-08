@@ -23,13 +23,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.dvinov.myspaceapp.R
 import com.dvinov.myspaceapp.downloadImage
+import com.dvinov.myspaceapp.getDominantColor
 import com.dvinov.myspaceapp.screen.apod.LoadResult
 import com.dvinov.myspaceapp.screen.apod.model.ApodModel
+import com.dvinov.myspaceapp.ui.theme.card_bg
+import com.dvinov.myspaceapp.ui.theme.primary
 import com.dvinov.myspaceapp.ui.theme.title
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.placeholder
+import com.google.accompanist.placeholder.shimmer
 import com.skydoves.landscapist.glide.GlideImageState
 import java.time.format.DateTimeFormatter
 
@@ -39,11 +45,13 @@ fun MediaHeader(
     navController: NavController,
     apodState: LoadResult.Success<ApodModel>,
     color: Color,
-    onChangeColor: (image: GlideImageState) -> Unit,
+    onChangeColor: (color: Color) -> Unit,
 ) {
-    var imageLoadState: LoadResult<Unit>? by remember {
+    var imageDownloadState: LoadResult<Unit>? by remember {
         mutableStateOf(null)
     }
+
+    var glideImageState: GlideImageState by remember { mutableStateOf(GlideImageState.None) }
 
     Column(modifier = modifier.fillMaxWidth()) {
         if (apodState.data?.date != null) {
@@ -63,25 +71,34 @@ fun MediaHeader(
         }
 
         if (!apodState.data?.url.isNullOrBlank()) {
-            if (apodState.data?.media_type == stringResource(R.string.image)) ImageView(
-                url = apodState.data.url!!,
-                apodState.data.title,
-                navController,
-                onChangeColor = onChangeColor
-            )
+            if (apodState.data?.media_type == stringResource(R.string.image))
+                ImageView(url = apodState.data.url!!,
+                    apodState.data.title,
+                    navController,
+                    onChangeState = remember {
+                        { state ->
+                            onChangeColor(getDominantColor(state))
+                            glideImageState = state
+                        }
+                    })
             else YouTubeView(apodState.data?.url)
         }
 
+
+
+
         if (!apodState.data?.title.isNullOrBlank()) TitleOrDownloadBtn(
-            modifier = Modifier.padding(top = 16.dp),
-            imageLoadState = imageLoadState,
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(if (glideImageState is GlideImageState.Success) color else card_bg),
+            imageLoadState = imageDownloadState,
             text = apodState.data?.title!!,
             type = apodState.data.media_type,
             url = apodState.data.hdurl ?: apodState.data.url,
             onChangeState = {
-                imageLoadState = it
+                imageDownloadState = it
             },
-            color = color
         )
     }
 }
@@ -96,7 +113,6 @@ fun TitleOrDownloadBtn(
     url: String?,
     type: String?,
     imageLoadState: LoadResult<Unit>?,
-    color: Color
 ) {
     val permissionState = rememberPermissionState(
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -104,22 +120,17 @@ fun TitleOrDownloadBtn(
     val context = LocalContext.current
 
     Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(15.dp))
-            .padding()
-            .background(color),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = text, style = title, modifier = Modifier
-                .padding(
-                    top = 12.dp, start = 15.dp, end = 15.dp, bottom = 12.dp
-                )
+            text = text,
+            style = title,
+            modifier = Modifier
+                .padding(top = 12.dp, start = 15.dp, end = 15.dp, bottom = 12.dp)
                 .weight(1f)
         )
-
-
         if (url != null && type != stringResource(R.string.video)) Box(
             modifier = Modifier
                 .size(40.dp)
@@ -131,7 +142,7 @@ fun TitleOrDownloadBtn(
                 }
                 is LoadResult.Loading -> {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(25.dp), strokeWidth = 3.5.dp
+                        modifier = Modifier.size(25.dp), strokeWidth = 3.5.dp, color = Color.White
                     )
                 }
                 else -> {
@@ -161,7 +172,8 @@ private fun DownloadBtn(
             } else {
                 downloadImage(url, context, onChangeState)
             }
-        }, modifier = Modifier.clip(RoundedCornerShape(50))
+        },
+        modifier = Modifier.clip(RoundedCornerShape(50))
     ) {
         Icon(
             painter = painterResource(id = R.drawable.download),

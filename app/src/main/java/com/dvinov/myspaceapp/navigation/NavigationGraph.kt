@@ -14,16 +14,12 @@ fun NavigationGraph(
     scrollState: ScrollState,
     modifier: Modifier, navController: NavHostController
 ) {
-
     NavHost(
         navController = navController,
         startDestination = apodScreenRoute,
         modifier = modifier,
     ) {
         apodScreen(scrollState, navController)
-
-        imageScreen() {
-            navController.popBackStack()
-        }
+        imageScreen(onBackClick = navController::popBackStack)
     }
 }
