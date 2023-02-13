@@ -1,4 +1,4 @@
-![banner.png](D:\Users\maksd\Desktop\Work\CosmosApp(v.2)\image\banner.png)
+![banner.png](image\banner.png)
 
 <a href="https://play.google.com/store/apps/details?id=com.dvinov.myspaceapp"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="70"></a>
 
@@ -8,11 +8,12 @@
 
 ##### The data is taken from the [Astronomical Picture of the Day](https://apod.nasa.gov/apod/astropix.html ) service.
 
-<img title="" src="file:///D:/Users/maksd/Desktop/Work/CosmosApp(v.2)/image/Banner 1.png" alt="Banner 1.png" width="717" data-align="left">
 
-<img title="" src="file:///D:/Users/maksd/Desktop/Work/CosmosApp(v.2)/image/Banner 2.png" alt="Banner 2.png" data-align="left">
+<img title="" src="image/Banner 1.png" alt="Banner 1.png" width="717" data-align="left">
 
-<img title="" src="file:///D:/Users/maksd/Desktop/Work/CosmosApp(v.2)/image/Banner 5.png" alt="Banner 5.png" data-align="left">
+<img title="" src="image/Banner 2.png" alt="Banner 2.png" data-align="left">
+
+<img title="" src="image/Banner 5.png" alt="Banner 5.png" data-align="left">
 
 # About the app
 
