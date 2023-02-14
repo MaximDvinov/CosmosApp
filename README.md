@@ -9,11 +9,11 @@
 ### The data is taken from the [Astronomical Picture of the Day](https://apod.nasa.gov/apod/astropix.html ) service.
 
 
-![banner.png](image/banner1.png "Cosmos Info")
+![banner.png](image/Banner1.png "Cosmos Info")
 
-![banner.png](image/banner2.png "Cosmos Info")
+![banner.png](image/Banner2.png "Cosmos Info")
 
-![banner.png](image/banner3.png "Cosmos Info")
+![banner.png](image/Banner3.png "Cosmos Info")
 
 ## About the app
 
